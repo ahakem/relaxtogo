@@ -1,0 +1,41 @@
+/* Hide YouTube branding and controls that lead to external links */
+.video-container iframe {
+  pointer-events: none;
+}
+
+.video-container iframe:hover {
+  pointer-events: auto;
+}
+
+/* Override YouTube player styles to hide external links */
+.video-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.video-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 50px;
+  background: transparent;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Hide YouTube logo area */
+.video-container iframe[src*="youtube.com"] {
+  position: relative;
+}
+
+/* Additional styles to prevent external navigation */
+.video-player-overlay {
+  position: relative;
+  user-select: none;
+}
+
+.video-player-overlay iframe {
+  background: #000;
+}
