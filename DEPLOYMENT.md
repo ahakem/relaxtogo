@@ -1,41 +1,32 @@
 # GitHub Pages Setup Instructions
 
-## Automatic Setup (Recommended)
+## 🚨 CRITICAL: Correct Settings Required
 
-Your repository is now ready for GitHub Pages! Follow these steps to enable it:
+### Step 1: Repository Settings
+1. Go to: https://github.com/ahakem/relaxtogo/settings/pages
+2. **Source**: Select "**GitHub Actions**" (NOT "Deploy from a branch")
+3. **Custom domain**: Leave empty (unless you have one)
+4. Click **Save**
 
-### 1. Enable GitHub Pages
-1. Go to your repository: https://github.com/ahakem/relaxtogo
-2. Click on **Settings** tab
-3. Scroll down to **Pages** section in the left sidebar
-4. Under **Source**, select "GitHub Actions"
-5. The workflow will automatically deploy your app
+### Step 2: Verify Repository is Public
+- The repository MUST be public for free GitHub Pages
+- Check repository visibility in Settings → General
 
-### 2. Access Your Live App
-Once deployment is complete (2-3 minutes), your app will be available at:
+### Step 3: Check Permissions
+Go to Settings → Actions → General and ensure:
+- **Actions permissions**: "Allow all actions and reusable workflows"
+- **Workflow permissions**: "Read and write permissions"
+
+### Step 4: Monitor Deployment
+1. Go to **Actions** tab: https://github.com/ahakem/relaxtogo/actions
+2. Wait for "Deploy to GitHub Pages" workflow to complete (green checkmark)
+3. Check for any error messages in red
+
+## ✅ Expected Result
+After successful deployment, your app will be live at:
 **https://ahakem.github.io/relaxtogo/**
 
-### 3. Verify Deployment
-- Check the **Actions** tab to see the deployment progress
-- Look for the green checkmark indicating successful deployment
-- Click on any workflow run to see detailed logs
-
-## Manual Deployment (Alternative)
-
-If you prefer manual deployment:
-
-1. Build the project locally:
-```bash
-npm run build
-```
-
-2. Use the `gh-pages` package:
-```bash
-npm install -g gh-pages
-gh-pages -d dist
-```
-
-## Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues:
 - **404 Error**: Make sure GitHub Pages is enabled in repository settings
