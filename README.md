@@ -50,7 +50,9 @@ npm run dev
 
 ## 🌐 Live Demo
 
-The app is deployed and available at: **https://ahakem.github.io/relaxtogo/**
+🚀 **The app is deployed and available at: https://ahakem.github.io/relaxtogo/**
+
+*Note: If you see a blank page, please ensure GitHub Pages is configured correctly in repository settings.*
 
 ## 📱 How to Add New Content
 
