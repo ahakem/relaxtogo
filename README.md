@@ -48,6 +48,10 @@ npm run dev
 
 4. Open your browser and visit `http://localhost:5173`
 
+## 🌐 Live Demo
+
+The app is deployed and available at: **https://ahakem.github.io/relaxtogo/**
+
 ## 📱 How to Add New Content
 
 ### Adding New Videos
@@ -156,6 +160,12 @@ The app is designed with mobile users in mind:
 
 ## 🎯 Production Deployment
 
+### GitHub Pages (Automatic)
+This project is automatically deployed to GitHub Pages on every push to the main branch.
+
+**Live URL**: https://ahakem.github.io/relaxtogo/
+
+### Manual Deployment
 1. Build the project:
 ```bash
 npm run build
@@ -164,9 +174,23 @@ npm run build
 2. Deploy the `dist` folder to your preferred hosting service:
    - Netlify
    - Vercel
-   - GitHub Pages
    - AWS S3
    - Any static hosting provider
+
+## 🚀 Development Workflow
+
+### Making Changes
+1. Make your changes to the code
+2. Test locally with `npm run dev`
+3. Commit and push to GitHub
+4. GitHub Actions will automatically build and deploy to GitHub Pages
+
+### GitHub Actions
+The project includes a GitHub Actions workflow that:
+- Builds the project on every push
+- Runs tests and linting
+- Deploys to GitHub Pages automatically
+- Supports Node.js 18+ environment
 
 ---
 
