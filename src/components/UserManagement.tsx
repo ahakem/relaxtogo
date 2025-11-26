@@ -166,10 +166,19 @@ const UserManagement: React.FC = () => {
   };
 
   const handleDeleteUser = async (userId: string) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    if (window.confirm('Are you sure you want to delete this user? This will remove them from the database.')) {
       try {
+        // Delete from Firestore
         await deleteDoc(doc(db, 'users', userId));
-        setMessage({ type: 'success', text: 'User deleted successfully!' });
+        
+        // Note: Deleting from Firebase Auth requires admin SDK or the user to be signed in
+        // For now, we can only delete from Firestore. Admin needs to manually delete from Auth console
+        // or we need to implement a Cloud Function for this.
+        
+        setMessage({ 
+          type: 'success', 
+          text: 'User deleted from database. Please also delete from Firebase Authentication console if needed.' 
+        });
         loadUsers();
       } catch (error) {
         setMessage({ type: 'error', text: 'Failed to delete user' });

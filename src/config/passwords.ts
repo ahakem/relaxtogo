@@ -17,6 +17,13 @@ export const isAdmin = async (): Promise<boolean> => {
   
   try {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
+    
+    // If user doesn't exist in database, log them out
+    if (!userDoc.exists()) {
+      await signOut(auth);
+      return false;
+    }
+    
     const userData = userDoc.data();
     return userData?.role === 'admin';
   } catch (error) {
@@ -30,10 +37,17 @@ export const loginWithEmailPassword = async (email: string, password: string) =>
   try {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     
-    // Check if user is suspended
+    // Check if user exists in Firestore
     const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+    
+    if (!userDoc.exists()) {
+      await signOut(auth);
+      return { success: false, error: 'User account not found in database. Please contact an administrator.' };
+    }
+    
     const userData = userDoc.data();
     
+    // Check if user is suspended
     if (userData?.suspended) {
       await signOut(auth);
       return { success: false, error: 'Your account has been suspended. Please contact an administrator.' };
