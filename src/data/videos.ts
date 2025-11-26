@@ -73,8 +73,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '10 min',
     level: 'Beginner',
     category: 'core',
-    videoUrl: 'https://www.youtube.com/watch?v=S5hIjMLw1Yg',
-    thumbnailUrl: 'https://img.youtube.com/vi/S5hIjMLw1Yg/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['core', 'abs', 'strength', 'beginner']
   },
   {
@@ -84,8 +84,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '15 min',
     level: 'Intermediate',
     category: 'core',
-    videoUrl: 'https://www.youtube.com/watch?v=qQQo5rbC-NE',
-    thumbnailUrl: 'https://img.youtube.com/vi/qQQo5rbC-NE/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['deep core', 'stability', 'intermediate', 'strength']
   },
   
@@ -97,8 +97,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '20 min',
     level: 'Beginner',
     category: 'back',
-    videoUrl: 'https://www.youtube.com/watch?v=4vTJHUDB5ak',
-    thumbnailUrl: 'https://img.youtube.com/vi/4vTJHUDB5ak/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['back pain', 'relief', 'gentle', 'mobility']
   },
   {
@@ -108,8 +108,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '25 min',
     level: 'Intermediate',
     category: 'back',
-    videoUrl: 'https://www.youtube.com/watch?v=6XcPUaXSKYs',
-    thumbnailUrl: 'https://img.youtube.com/vi/6XcPUaXSKYs/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['back strength', 'posture', 'intermediate', 'flow']
   },
   
@@ -121,8 +121,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '18 min',
     level: 'Beginner',
     category: 'legs',
-    videoUrl: 'https://www.youtube.com/watch?v=CLKgOU2ln8Y',
-    thumbnailUrl: 'https://img.youtube.com/vi/CLKgOU2ln8Y/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['hip opening', 'flexibility', 'stretching', 'beginner']
   },
   {
@@ -132,8 +132,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '22 min',
     level: 'Intermediate',
     category: 'legs',
-    videoUrl: 'https://www.youtube.com/watch?v=oBu-pQG6sTY',
-    thumbnailUrl: 'https://img.youtube.com/vi/oBu-pQG6sTY/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['leg strength', 'quads', 'glutes', 'power']
   },
   
@@ -145,8 +145,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '16 min',
     level: 'Intermediate',
     category: 'arms',
-    videoUrl: 'https://www.youtube.com/watch?v=Mm25wJU7QgM',
-    thumbnailUrl: 'https://img.youtube.com/vi/Mm25wJU7QgM/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['arm balance', 'strength', 'preparation', 'advanced']
   },
   {
@@ -156,8 +156,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '12 min',
     level: 'Beginner',
     category: 'arms',
-    videoUrl: 'https://www.youtube.com/watch?v=GLy2rYHwUqY',
-    thumbnailUrl: 'https://img.youtube.com/vi/GLy2rYHwUqY/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['shoulder release', 'desk work', 'gentle', 'mobility']
   },
   
@@ -169,8 +169,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '8 min',
     level: 'Beginner',
     category: 'neck',
-    videoUrl: 'https://www.youtube.com/watch?v=VaoV1PrYft4',
-    thumbnailUrl: 'https://img.youtube.com/vi/VaoV1PrYft4/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['neck relief', 'tension', 'quick', 'workplace']
   },
   {
@@ -180,8 +180,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '14 min',
     level: 'Beginner',
     category: 'neck',
-    videoUrl: 'https://www.youtube.com/watch?v=2MjOelW9Z_4',
-    thumbnailUrl: 'https://img.youtube.com/vi/2MjOelW9Z_4/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['headache relief', 'mobility', 'gentle', 'neck']
   },
   
@@ -193,8 +193,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '30 min',
     level: 'Intermediate',
     category: 'fullbody',
-    videoUrl: 'https://www.youtube.com/watch?v=v7AYKMP6rOE',
-    thumbnailUrl: 'https://img.youtube.com/vi/v7AYKMP6rOE/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['morning', 'full body', 'energizing', 'complete']
   },
   {
@@ -204,19 +204,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '45 min',
     level: 'Advanced',
     category: 'fullbody',
-    videoUrl: 'https://www.youtube.com/watch?v=4C-gxOE0j7s',
-    thumbnailUrl: 'https://img.youtube.com/vi/4C-gxOE0j7s/maxresdefault.jpg',
-    tags: ['dynamic', 'full body', 'complete', 'advanced']
-  },
-  {
-    id: '12',
-    title: 'Total Body Yoga Flow',
-    description: 'Dynamic full-body sequence combining strength, flexibility, and mindfulness in one complete practice.',
-    duration: '45 min',
-    level: 'Advanced',
-    category: 'fullbody',
-    videoUrl: 'https://www.youtube.com/watch?v=4C-gxOE0j7s',
-    thumbnailUrl: 'https://img.youtube.com/vi/4C-gxOE0j7s/maxresdefault.jpg',
+    videoUrl: 'https://vimeo.com/1140736577/f6a0c2e531',
+    thumbnailUrl: 'https://i.vimeocdn.com/video/1962825000-6c7e7e9e1e9f2f9f9f9f9f9f9f9f9f9f9f9f9f9f_640',
     tags: ['dynamic', 'full body', 'complete', 'advanced']
   }
 ];

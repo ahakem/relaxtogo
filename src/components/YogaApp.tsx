@@ -223,7 +223,7 @@ export default function YogaApp() {
             <Box className="video-container" sx={{ position: 'relative', paddingTop: '56.25%' }}>
               <Box
                 component="iframe"
-                src={`https://www.youtube-nocookie.com/embed/${state.selectedVideo.videoUrl.split('v=')[1]?.split('&')[0]}?autoplay=1&modestbranding=1&rel=0&showinfo=0&controls=1&disablekb=1&fs=0&iv_load_policy=3`}
+                src={`https://player.vimeo.com/video/${state.selectedVideo.videoUrl.split('/')[3]}?h=${state.selectedVideo.videoUrl.split('/')[4]}&autoplay=1&title=0&byline=0&portrait=0`}
                 sx={{
                   position: 'absolute',
                   top: 0,
