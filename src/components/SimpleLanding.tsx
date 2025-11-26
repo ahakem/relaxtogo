@@ -9,7 +9,7 @@ import {
   Alert,
 } from '@mui/material';
 import { Lock } from '@mui/icons-material';
-import { isValidPassword } from '../config/passwords';
+import { isValidPassword, setAuthentication } from '../config/passwords';
 
 interface SimpleLandingProps {
   onLogin: () => void;
@@ -23,8 +23,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
     e.preventDefault();
     
     if (isValidPassword(password)) {
-      localStorage.setItem('yoga_auth', 'true');
-      localStorage.setItem('yoga_auth_time', Date.now().toString());
+      setAuthentication();
       onLogin();
     } else {
       setError('Incorrect password. Please try again.');
