@@ -11,13 +11,12 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Lock } from '@mui/icons-material';
-import { isValidPassword, setAuthentication } from '../config/passwords';
 
 interface LoginPageProps {
   onLogin: () => void;
 }
 
-export default function LoginPage({ onLogin }: LoginPageProps) {
+export default function LoginPage({ onLogin: _onLogin }: LoginPageProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -30,13 +29,9 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     // Simulate a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 800));
 
-    if (isValidPassword(password)) {
-      setAuthentication();
-      onLogin();
-    } else {
-      setError('Invalid password. Please try again.');
-      setPassword('');
-    }
+    // This component is deprecated - now using Firebase authentication
+    setError('This login method is no longer supported. Please use the main authentication system.');
+    setPassword('');
     
     setLoading(false);
   };
