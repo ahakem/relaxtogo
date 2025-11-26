@@ -21,6 +21,7 @@ import {
   Info,
   Close,
   Logout,
+  Settings,
 } from '@mui/icons-material';
 import Header from './Header';
 import CategoryGrid from './CategoryGrid';
@@ -140,8 +141,16 @@ export default function YogaApp() {
     <Container maxWidth="lg" sx={{ py: 2 }}>
       <Header onMenuClick={handleMenuClick} />
       
-      {/* Logout Button */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+      {/* Logout and Settings Buttons */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
+        <Button
+          variant="outlined"
+          size="small"
+          startIcon={<Settings />}
+          onClick={() => navigate('/settings')}
+        >
+          Settings
+        </Button>
         <Button
           variant="outlined"
           size="small"
