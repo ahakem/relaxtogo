@@ -5,15 +5,9 @@ import {
   CssBaseline,
 } from '@mui/material';
 import { theme } from './theme';
-import LandingPage from './components/LandingPage';
-import LoginPage from './components/LoginPage';
+import SimpleLanding from './components/SimpleLanding';
 import YogaApp from './components/YogaApp';
 import ProtectedRoute from './components/ProtectedRoute';
-import ChairMassagePage from './components/ChairMassagePage';
-import PricingPage from './components/PricingPage';
-import AboutPage from './components/AboutPage';
-import InfoPage from './components/InfoPage';
-import ContactPage from './components/ContactPage';
 import { isAuthenticated } from './config/passwords';
 
 function LoginRoute() {
@@ -21,19 +15,19 @@ function LoginRoute() {
   
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate('/align', { replace: true });
+      navigate('/videos', { replace: true });
     }
   }, [navigate]);
 
   const handleLogin = () => {
-    navigate('/align', { replace: true });
+    navigate('/videos', { replace: true });
   };
 
   if (isAuthenticated()) {
-    return <Navigate to="/align" replace />;
+    return <Navigate to="/videos" replace />;
   }
 
-  return <LoginPage onLogin={handleLogin} />;
+  return <SimpleLanding onLogin={handleLogin} />;
 }
 
 function App() {
@@ -42,20 +36,14 @@ function App() {
       <CssBaseline />
       <HashRouter>
         <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginRoute />} />
-          <Route path="/chair-massage" element={<ChairMassagePage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/info" element={<InfoPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route 
-            path="/align" 
+          <Route path="/" element={<LoginRoute />} />
+          <Route
+            path="/videos"
             element={
               <ProtectedRoute>
                 <YogaApp />
               </ProtectedRoute>
-            } 
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

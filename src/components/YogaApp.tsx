@@ -194,48 +194,49 @@ export default function YogaApp() {
       <Dialog
         open={state.videoDialogOpen}
         onClose={handleVideoDialogClose}
-        maxWidth="md"
+        maxWidth={false}
         fullWidth
+        fullScreen
         sx={{
           '& .MuiDialog-paper': {
             backgroundColor: 'black',
+            margin: 0,
+            maxHeight: '100%',
+            maxWidth: '100%',
           }
         }}
       >
-        <DialogContent sx={{ p: 0, position: 'relative' }}>
+        <DialogContent sx={{ p: 0, position: 'relative', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <IconButton
             onClick={handleVideoDialogClose}
             sx={{
               position: 'absolute',
-              right: 8,
-              top: 8,
+              right: 16,
+              top: 16,
               color: 'white',
-              backgroundColor: 'rgba(0,0,0,0.5)',
+              backgroundColor: 'rgba(0,0,0,0.7)',
               zIndex: 9999,
               '&:hover': {
-                backgroundColor: 'rgba(0,0,0,0.7)',
+                backgroundColor: 'rgba(0,0,0,0.9)',
               }
             }}
           >
             <Close />
           </IconButton>
           {state.selectedVideo && (
-            <Box className="video-container" sx={{ position: 'relative', paddingTop: '56.25%' }}>
+            <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Box
                 component="iframe"
-                src={`https://player.vimeo.com/video/${state.selectedVideo.videoUrl.split('/')[3]}?h=${state.selectedVideo.videoUrl.split('/')[4]}&autoplay=1&title=0&byline=0&portrait=0`}
+                src={`https://player.vimeo.com/video/${state.selectedVideo.videoUrl.split('/')[3]}?h=${state.selectedVideo.videoUrl.split('/')[4]}&autoplay=1`}
                 sx={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
                   width: '100%',
                   height: '100%',
                   border: 'none',
                 }}
                 allowFullScreen
+                allow="autoplay; fullscreen; picture-in-picture"
                 title={state.selectedVideo.title}
               />
-              <Box className="video-player-overlay" />
             </Box>
           )}
         </DialogContent>
