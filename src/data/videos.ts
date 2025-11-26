@@ -73,8 +73,8 @@ export const yogaVideos: YogaVideo[] = [
     duration: '10 min',
     level: 'Beginner',
     category: 'core',
-    videoUrl: 'https://www.youtube.com/watch?v=Eml2xnoLpYE',
-    thumbnailUrl: 'https://img.youtube.com/vi/Eml2xnoLpYE/maxresdefault.jpg',
+    videoUrl: 'https://www.youtube.com/watch?v=S5hIjMLw1Yg',
+    thumbnailUrl: 'https://img.youtube.com/vi/S5hIjMLw1Yg/maxresdefault.jpg',
     tags: ['core', 'abs', 'strength', 'beginner']
   },
   {
@@ -196,6 +196,17 @@ export const yogaVideos: YogaVideo[] = [
     videoUrl: 'https://www.youtube.com/watch?v=v7AYKMP6rOE',
     thumbnailUrl: 'https://img.youtube.com/vi/v7AYKMP6rOE/maxresdefault.jpg',
     tags: ['morning', 'full body', 'energizing', 'complete']
+  },
+  {
+    id: '12',
+    title: 'Total Body Yoga Flow',
+    description: 'Dynamic full-body sequence combining strength, flexibility, and mindfulness in one complete practice.',
+    duration: '45 min',
+    level: 'Advanced',
+    category: 'fullbody',
+    videoUrl: 'https://www.youtube.com/watch?v=4C-gxOE0j7s',
+    thumbnailUrl: 'https://img.youtube.com/vi/4C-gxOE0j7s/maxresdefault.jpg',
+    tags: ['dynamic', 'full body', 'complete', 'advanced']
   },
   {
     id: '12',
