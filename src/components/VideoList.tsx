@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Typography,
   Box,
   Button,
   IconButton,
+  CircularProgress,
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import VideoCard from './VideoCard';
-import { getVideosByCategory, getCategoryById } from '../data/videos';
+import { getCategoryById } from '../data/videos';
 import type { YogaVideo } from '../data/videos';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 interface VideoListProps {
   categoryId: string;
@@ -18,8 +21,29 @@ interface VideoListProps {
 }
 
 const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }) => {
+  const [videos, setVideos] = useState<YogaVideo[]>([]);
+  const [loading, setLoading] = useState(true);
   const category = getCategoryById(categoryId);
-  const videos = getVideosByCategory(categoryId);
+
+  useEffect(() => {
+    const loadVideos = async () => {
+      try {
+        setLoading(true);
+        const q = query(collection(db, 'videos'), where('category', '==', categoryId));
+        const querySnapshot = await getDocs(q);
+        const loadedVideos = querySnapshot.docs.map(doc => ({
+          ...doc.data()
+        } as YogaVideo));
+        setVideos(loadedVideos);
+      } catch (error) {
+        console.error('Error loading videos:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadVideos();
+  }, [categoryId]);
 
   if (!category) {
     return (
@@ -28,6 +52,14 @@ const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }
         <Button onClick={onBack} sx={{ mt: 2 }}>
           Go Back
         </Button>
+      </Box>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
+        <CircularProgress />
       </Box>
     );
   }
