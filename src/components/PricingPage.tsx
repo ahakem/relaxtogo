@@ -18,7 +18,6 @@ import {
 import {
   CheckCircle,
   Business,
-  Person,
   AccessTime,
   Euro,
   Phone,
