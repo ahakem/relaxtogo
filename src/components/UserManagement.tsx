@@ -23,30 +23,46 @@ import {
   InputLabel,
   Tabs,
   Tab,
+  Drawer,
+  ListItemIcon,
+  Divider,
+  Avatar,
 } from '@mui/material';
-import { Delete, Add, People, VideoLibrary } from '@mui/icons-material';
-import { collection, addDoc, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
+import { Delete, Add, People, VideoLibrary, Home, Logout, Settings, Edit, Category, Block } from '@mui/icons-material';
+import { collection, deleteDoc, doc, getDocs, setDoc, getDoc } from 'firebase/firestore';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db } from '../config/firebase';
+import { logout } from '../config/passwords';
+import { useNavigate } from 'react-router-dom';
 import AdminPanel from './AdminPanel';
+import CategoryManagement from './CategoryManagement';
+import Header from './Header';
 
 interface User {
   id: string;
   email: string;
+  name: string;
   role: 'user' | 'admin';
+  suspended: boolean;
   createdAt: string;
 }
 
 const UserManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [tabValue, setTabValue] = useState(0);
+  const [userName, setUserName] = useState<string>('');
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
   
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    name: '',
     role: 'user' as 'user' | 'admin',
   });
 
@@ -70,13 +86,38 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     loadUsers();
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.data();
+        if (userData) {
+          setUserName(userData.name || 'Admin');
+          setIsUserAdmin(userData.role === 'admin');
+        }
+      }
+    };
+    fetchUserData();
   }, []);
 
   const handleOpenDialog = () => {
+    setEditingUser(null);
     setFormData({
       email: '',
       password: '',
+      name: '',
       role: 'user',
+    });
+    setDialogOpen(true);
+  };
+
+  const handleEditUser = (user: User) => {
+    setEditingUser(user);
+    setFormData({
+      email: user.email,
+      password: '',
+      name: user.name,
+      role: user.role,
     });
     setDialogOpen(true);
   };
@@ -87,26 +128,40 @@ const UserManagement: React.FC = () => {
 
   const handleCreateUser = async () => {
     try {
-      // Create user in Firebase Auth
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password
-      );
+      if (editingUser) {
+        // Update existing user
+        await setDoc(doc(db, 'users', editingUser.id), {
+          email: formData.email,
+          name: formData.name,
+          role: formData.role,
+          suspended: editingUser.suspended || false,
+          createdAt: editingUser.createdAt,
+        });
+        setMessage({ type: 'success', text: 'User updated successfully!' });
+      } else {
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          formData.email,
+          formData.password
+        );
+        
+        // Store user data in Firestore
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          email: formData.email,
+          name: formData.name,
+          role: formData.role,
+          suspended: false,
+          createdAt: new Date().toISOString(),
+        });
+        setMessage({ type: 'success', text: 'User created successfully!' });
+      }
       
-      // Store user data in Firestore
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email: formData.email,
-        role: formData.role,
-        createdAt: new Date().toISOString(),
-      });
-      
-      setMessage({ type: 'success', text: 'User created successfully!' });
       handleCloseDialog();
       loadUsers();
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to create user' });
-      console.error('Error creating user:', error);
+      setMessage({ type: 'error', text: error.message || 'Failed to save user' });
+      console.error('Error saving user:', error);
     }
   };
 
@@ -123,6 +178,41 @@ const UserManagement: React.FC = () => {
     }
   };
 
+  const handleToggleSuspend = async (user: User) => {
+    try {
+      await setDoc(doc(db, 'users', user.id), {
+        ...user,
+        suspended: !user.suspended,
+      });
+      setMessage({ 
+        type: 'success', 
+        text: user.suspended ? 'User activated successfully!' : 'User suspended successfully!' 
+      });
+      loadUsers();
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to update user status' });
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  };
+
+  const handleMenuClick = () => {
+    setDrawerOpen(true);
+  };
+
+  const handleDrawerClose = () => {
+    setDrawerOpen(false);
+  };
+
+  const menuItems = [
+    { icon: <Home />, text: 'Videos', action: () => { navigate('/videos'); handleDrawerClose(); } },
+    { icon: <Settings />, text: 'Settings', action: () => { navigate('/settings'); handleDrawerClose(); } },
+  ];
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh' }}>
@@ -132,17 +222,22 @@ const UserManagement: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
-        <Tabs value={tabValue} onChange={(e, newValue) => setTabValue(newValue)}>
+    <Box sx={{ minHeight: '100vh' }}>
+      <Header onMenuClick={handleMenuClick} />
+      <Container maxWidth="lg" sx={{ py: 2 }}>
+      <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3, mt: 2 }}>
+        <Tabs value={tabValue} onChange={(_, newValue) => setTabValue(newValue)}>
           <Tab icon={<VideoLibrary />} label="Videos" />
+          <Tab icon={<Category />} label="Categories" />
           <Tab icon={<People />} label="Users" />
         </Tabs>
       </Box>
 
       {tabValue === 0 && <AdminPanel />}
       
-      {tabValue === 1 && (
+      {tabValue === 1 && <CategoryManagement />}
+      
+      {tabValue === 2 && (
         <>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -181,23 +276,52 @@ const UserManagement: React.FC = () => {
                   <ListItem
                     key={user.id}
                     secondaryAction={
-                      <IconButton edge="end" onClick={() => handleDeleteUser(user.id)}>
-                        <Delete />
-                      </IconButton>
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <IconButton 
+                          edge="end" 
+                          onClick={() => handleToggleSuspend(user)}
+                          color={user.suspended ? 'success' : 'warning'}
+                          title={user.suspended ? 'Activate User' : 'Suspend User'}
+                        >
+                          <Block />
+                        </IconButton>
+                        <IconButton edge="end" onClick={() => handleEditUser(user)}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton edge="end" onClick={() => handleDeleteUser(user.id)}>
+                          <Delete />
+                        </IconButton>
+                      </Box>
                     }
                   >
                     <ListItemText
                       primary={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          {user.email}
+                          <Typography 
+                            variant="body1" 
+                            fontWeight={600}
+                            sx={{ 
+                              textDecoration: user.suspended ? 'line-through' : 'none',
+                              color: user.suspended ? 'text.disabled' : 'text.primary'
+                            }}
+                          >
+                            {user.name}
+                          </Typography>
                           <Chip 
                             label={user.role} 
                             size="small" 
                             color={user.role === 'admin' ? 'error' : 'default'}
                           />
+                          {user.suspended && (
+                            <Chip 
+                              label="Suspended" 
+                              size="small" 
+                              color="warning"
+                            />
+                          )}
                         </Box>
                       }
-                      secondary={`Created: ${new Date(user.createdAt).toLocaleDateString()}`}
+                      secondary={`${user.email} • Created: ${new Date(user.createdAt).toLocaleDateString()}`}
                     />
                   </ListItem>
                 ))
@@ -205,26 +329,37 @@ const UserManagement: React.FC = () => {
             </List>
           </Paper>
 
-          {/* Add User Dialog */}
+          {/* Add/Edit User Dialog */}
           <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-            <DialogTitle>Add New User</DialogTitle>
+            <DialogTitle>{editingUser ? 'Edit User' : 'Add New User'}</DialogTitle>
             <DialogContent>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 2 }}>
+                <TextField
+                  label="Name"
+                  type="text"
+                  fullWidth
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                />
                 <TextField
                   label="Email"
                   type="email"
                   fullWidth
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  disabled={!!editingUser}
+                  helperText={editingUser ? 'Email cannot be changed' : ''}
                 />
-                <TextField
-                  label="Password"
-                  type="password"
-                  fullWidth
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  helperText="Minimum 6 characters"
-                />
+                {!editingUser && (
+                  <TextField
+                    label="Password"
+                    type="password"
+                    fullWidth
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    helperText="Minimum 6 characters"
+                  />
+                )}
                 <FormControl fullWidth>
                   <InputLabel>Role</InputLabel>
                   <Select
@@ -241,13 +376,57 @@ const UserManagement: React.FC = () => {
             <DialogActions>
               <Button onClick={handleCloseDialog}>Cancel</Button>
               <Button onClick={handleCreateUser} variant="contained">
-                Create User
+                {editingUser ? 'Update User' : 'Create User'}
               </Button>
             </DialogActions>
           </Dialog>
         </>
       )}
-    </Container>
+
+      <Drawer
+        anchor="left"
+        open={drawerOpen}
+        onClose={handleDrawerClose}
+      >
+        <Box sx={{ width: 250 }}>
+          <Box sx={{ p: 2, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar sx={{ bgcolor: '#4CAF50' }}>
+              {userName.charAt(0).toUpperCase()}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600}>
+                {userName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isUserAdmin ? 'Admin' : 'User'}
+              </Typography>
+            </Box>
+          </Box>
+          <Divider />
+          <List>
+            {menuItems.map((item, index) => (
+              <ListItem 
+                key={index}
+                onClick={item.action}
+                sx={{ cursor: 'pointer' }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItem>
+            ))}
+            <Divider />
+            <ListItem 
+              onClick={() => { handleLogout(); handleDrawerClose(); }}
+              sx={{ cursor: 'pointer', color: 'error.main' }}
+            >
+              <ListItemIcon><Logout sx={{ color: 'error.main' }} /></ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
+          </List>
+        </Box>
+      </Drawer>
+      </Container>
+    </Box>
   );
 };
 

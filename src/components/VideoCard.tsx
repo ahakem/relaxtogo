@@ -4,10 +4,8 @@ import {
   CardMedia,
   CardContent,
   Typography,
-  Chip,
   Box,
   IconButton,
-  Stack,
 } from '@mui/material';
 import { PlayArrow, Schedule } from '@mui/icons-material';
 import type { YogaVideo } from '../data/videos';
@@ -18,18 +16,6 @@ interface VideoCardProps {
 }
 
 const VideoCard: React.FC<VideoCardProps> = ({ video, onPlay }) => {
-  const getLevelColor = (level: string) => {
-    switch (level) {
-      case 'Beginner':
-        return 'success';
-      case 'Intermediate':
-        return 'warning';
-      case 'Advanced':
-        return 'error';
-      default:
-        return 'default';
-    }
-  };
 
   return (
     <Card
@@ -94,19 +80,12 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onPlay }) => {
           {video.description}
         </Typography>
         
-        <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-          <Chip 
-            label={video.level} 
-            size="small" 
-            color={getLevelColor(video.level) as any}
-          />
-          <Chip 
-            icon={<Schedule />} 
-            label={video.duration} 
-            size="small" 
-            variant="outlined"
-          />
-        </Stack>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Schedule sx={{ fontSize: 18, color: 'text.secondary' }} />
+          <Typography variant="body2" color="text.secondary">
+            {video.duration}
+          </Typography>
+        </Box>
       </CardContent>
     </Card>
   );

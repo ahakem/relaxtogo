@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Typography,
   Box,
-  Button,
   Card,
   CardContent,
+  CircularProgress,
+  Button,
 } from '@mui/material';
 import { 
   WbSunny, 
@@ -16,10 +17,20 @@ import {
   School,
   DirectionsRun,
   Psychology,
-  Healing
+  Healing,
+  FavoriteBorder,
+  LocalFlorist,
 } from '@mui/icons-material';
-import { categories } from '../data/videos';
-import type { VideoCategory } from '../data/videos';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
+
+interface VideoCategory {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+  icon: string;
+}
 
 interface CategoryGridProps {
   onCategorySelect: (categoryId: string) => void;
@@ -35,9 +46,40 @@ const iconMap: { [key: string]: React.ElementType } = {
   DirectionsRun,
   Psychology,
   Healing,
+  FavoriteBorder,
+  LocalFlorist,
 };
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
+  const [categories, setCategories] = useState<VideoCategory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'categories'));
+        const loadedCategories = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        } as VideoCategory));
+        setCategories(loadedCategories);
+      } catch (error) {
+        console.error('Error loading categories:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCategories();
+  }, []);
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ mb: 4 }}>
       <Typography 

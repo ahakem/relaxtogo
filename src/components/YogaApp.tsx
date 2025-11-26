@@ -13,24 +13,24 @@ import {
   DialogContent,
   IconButton,
   Backdrop,
-  Button,
+  Typography,
+  Avatar,
 } from '@mui/material';
 import { 
-  Home, 
-  Category, 
-  Info,
+  Home,
   Close,
   Logout,
   Settings,
+  AdminPanelSettings,
 } from '@mui/icons-material';
 import Header from './Header';
 import CategoryGrid from './CategoryGrid';
 import VideoList from './VideoList';
 import type { YogaVideo } from '../data/videos';
-import { logout } from '../config/passwords';
+import { logout, isAdmin } from '../config/passwords';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../config/firebase';
+import { doc, getDoc } from 'firebase/firestore';
+import { db, auth } from '../config/firebase';
 
 type ViewMode = 'home' | 'category';
 
@@ -49,6 +49,27 @@ export default function YogaApp() {
     drawerOpen: false,
     videoDialogOpen: false,
   });
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const [userName, setUserName] = useState<string>('');
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      const adminStatus = await isAdmin();
+      setIsUserAdmin(adminStatus);
+    };
+    const fetchUserData = async () => {
+      const user = auth.currentUser;
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.data();
+        if (userData) {
+          setUserName(userData.name || 'User');
+        }
+      }
+    };
+    checkAdminStatus();
+    fetchUserData();
+  }, []);
 
   const handleMenuClick = () => {
     setState(prev => ({ ...prev, drawerOpen: true }));
@@ -133,34 +154,18 @@ export default function YogaApp() {
 
   const menuItems = [
     { icon: <Home />, text: 'Home', action: handleBackToHome },
-    { icon: <Category />, text: 'Categories', action: () => handleCategorySelect('') },
-    { icon: <Info />, text: 'About', action: () => {} },
+    { icon: <Settings />, text: 'Settings', action: () => { navigate('/settings'); handleDrawerClose(); } },
+    ...(isUserAdmin ? [{ 
+      icon: <AdminPanelSettings />, 
+      text: 'Admin', 
+      action: () => { navigate('/admin'); handleDrawerClose(); } 
+    }] : []),
   ];
 
   return (
-    <Container maxWidth="lg" sx={{ py: 2 }}>
-      <Header onMenuClick={handleMenuClick} />
-      
-      {/* Logout and Settings Buttons */}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mb: 2 }}>
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<Settings />}
-          onClick={() => navigate('/settings')}
-        >
-          Settings
-        </Button>
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<Logout />}
-          onClick={handleLogout}
-        >
-          Logout
-        </Button>
-      </Box>
-
+    <Box sx={{ minHeight: '100vh' }}>
+      <Header onMenuClick={handleMenuClick} showAdminButton={isUserAdmin} />
+      <Container maxWidth="lg" sx={{ py: 2 }}>
       {state.view === 'home' && (
         <CategoryGrid onCategorySelect={handleCategorySelect} />
       )}
@@ -179,6 +184,20 @@ export default function YogaApp() {
         onClose={handleDrawerClose}
       >
         <Box sx={{ width: 250 }}>
+          <Box sx={{ p: 2, backgroundColor: '#f5f5f5', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Avatar sx={{ bgcolor: '#4CAF50' }}>
+              {userName.charAt(0).toUpperCase()}
+            </Avatar>
+            <Box>
+              <Typography variant="subtitle1" fontWeight={600}>
+                {userName}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {isUserAdmin ? 'Admin' : 'User'}
+              </Typography>
+            </Box>
+          </Box>
+          <Divider />
           <List>
             {menuItems.map((item, index) => (
               <ListItem 
@@ -192,7 +211,7 @@ export default function YogaApp() {
             ))}
             <Divider />
             <ListItem 
-              onClick={handleLogout}
+              onClick={() => { handleLogout(); handleDrawerClose(); }}
               sx={{ cursor: 'pointer', color: 'error.main' }}
             >
               <ListItemIcon><Logout sx={{ color: 'error.main' }} /></ListItemIcon>
@@ -258,6 +277,7 @@ export default function YogaApp() {
         open={false}
       >
       </Backdrop>
-    </Container>
+      </Container>
+    </Box>
   );
 }

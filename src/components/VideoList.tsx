@@ -9,10 +9,16 @@ import {
 } from '@mui/material';
 import { ArrowBack } from '@mui/icons-material';
 import VideoCard from './VideoCard';
-import { getCategoryById } from '../data/videos';
 import type { YogaVideo } from '../data/videos';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
+
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+  color: string;
+}
 
 interface VideoListProps {
   categoryId: string;
@@ -22,13 +28,24 @@ interface VideoListProps {
 
 const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }) => {
   const [videos, setVideos] = useState<YogaVideo[]>([]);
+  const [category, setCategory] = useState<Category | null>(null);
   const [loading, setLoading] = useState(true);
-  const category = getCategoryById(categoryId);
 
   useEffect(() => {
-    const loadVideos = async () => {
+    const loadData = async () => {
       try {
         setLoading(true);
+        
+        // Load category
+        const categoryDoc = await getDoc(doc(db, 'categories', categoryId));
+        if (categoryDoc.exists()) {
+          setCategory({
+            id: categoryDoc.id,
+            ...categoryDoc.data()
+          } as Category);
+        }
+        
+        // Load videos
         const q = query(collection(db, 'videos'), where('category', '==', categoryId));
         const querySnapshot = await getDocs(q);
         const loadedVideos = querySnapshot.docs.map(doc => ({
@@ -36,13 +53,13 @@ const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }
         } as YogaVideo));
         setVideos(loadedVideos);
       } catch (error) {
-        console.error('Error loading videos:', error);
+        console.error('Error loading data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadVideos();
+    loadData();
   }, [categoryId]);
 
   if (!category) {

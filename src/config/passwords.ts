@@ -28,7 +28,17 @@ export const isAdmin = async (): Promise<boolean> => {
 // Login with email and password
 export const loginWithEmailPassword = async (email: string, password: string) => {
   try {
-    await signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    
+    // Check if user is suspended
+    const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
+    const userData = userDoc.data();
+    
+    if (userData?.suspended) {
+      await signOut(auth);
+      return { success: false, error: 'Your account has been suspended. Please contact an administrator.' };
+    }
+    
     return { success: true };
   } catch (error: any) {
     return { success: false, error: error.message };

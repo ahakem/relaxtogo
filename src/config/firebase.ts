@@ -2,16 +2,15 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// TODO: Replace with your Firebase project configuration
-// Get this from Firebase Console > Project Settings > General > Your apps > SDK setup and configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyCXmYLg3VOOuMLMJVhAKtwWkAaqDSDzwYE",
-  authDomain: "align-with-kamine.firebaseapp.com",
-  projectId: "align-with-kamine",
-  storageBucket: "align-with-kamine.firebasestorage.app",
-  messagingSenderId: "269076973618",
-  appId: "1:269076973618:web:18813bfa44f6f4299d142b",
-  measurementId: "G-G461J1DWYP"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

@@ -16,14 +16,21 @@ import {
   DialogActions,
   Alert,
   CircularProgress,
+  MenuItem,
 } from '@mui/material';
 import { Delete, Edit, Add, VideoLibrary } from '@mui/icons-material';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { YogaVideo } from '../data/videos';
 
+interface Category {
+  id: string;
+  name: string;
+}
+
 const AdminPanel: React.FC = () => {
   const [videos, setVideos] = useState<(YogaVideo & { firestoreId?: string })[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingVideo, setEditingVideo] = useState<(YogaVideo & { firestoreId?: string }) | null>(null);
@@ -38,6 +45,20 @@ const AdminPanel: React.FC = () => {
     videoUrl: '',
     thumbnailUrl: '',
   });
+
+  // Load categories from Firestore
+  const loadCategories = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'categories'));
+      const loadedCategories = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.data().name,
+      }));
+      setCategories(loadedCategories);
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  };
 
   // Load videos from Firestore
   const loadVideos = async () => {
@@ -58,6 +79,7 @@ const AdminPanel: React.FC = () => {
   };
 
   useEffect(() => {
+    loadCategories();
     loadVideos();
   }, []);
 
@@ -225,16 +247,14 @@ const AdminPanel: React.FC = () => {
               label="Category"
               fullWidth
               select
-              SelectProps={{ native: true }}
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             >
-              <option value="core">Core & Abs</option>
-              <option value="back">Back & Spine</option>
-              <option value="legs">Legs & Hips</option>
-              <option value="arms">Arms & Shoulders</option>
-              <option value="neck">Neck & Head</option>
-              <option value="fullbody">Full Body Flow</option>
+              {categories.map((cat) => (
+                <MenuItem key={cat.id} value={cat.id}>
+                  {cat.name}
+                </MenuItem>
+              ))}
             </TextField>
             <TextField
               label="Vimeo Video URL"
