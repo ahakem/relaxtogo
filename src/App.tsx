@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { HashRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import {
   ThemeProvider,
@@ -13,12 +12,6 @@ import { isAuthenticated } from './config/passwords';
 
 function LoginRoute() {
   const navigate = useNavigate();
-  
-  useEffect(() => {
-    if (isAuthenticated()) {
-      navigate('/videos', { replace: true });
-    }
-  }, [navigate]);
 
   const handleLogin = () => {
     navigate('/videos', { replace: true });
