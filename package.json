@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://ahakim-lab.github.io/relaxtogo",
+  "homepage": "https://ahakem.github.io/relaxtogo",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
