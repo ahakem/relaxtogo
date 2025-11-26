@@ -9,26 +9,32 @@ import {
   Alert,
 } from '@mui/material';
 import { Lock } from '@mui/icons-material';
-import { isValidPassword, setAuthentication } from '../config/passwords';
+import { loginWithEmailPassword } from '../config/passwords';
 
 interface SimpleLandingProps {
   onLogin: () => void;
 }
 
 const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
+    setError('');
     
-    if (isValidPassword(password)) {
-      setAuthentication();
+    const result = await loginWithEmailPassword(email, password);
+    
+    if (result.success) {
       onLogin();
     } else {
-      setError('Incorrect password. Please try again.');
+      setError(result.error || 'Login failed. Please check your credentials.');
       setPassword('');
     }
+    setLoading(false);
   };
 
   return (
@@ -149,11 +155,25 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                   Login
                 </Typography>
                 <Typography variant="body2" sx={{ color: '#666', mt: 1 }}>
-                  Voer je wachtwoord in om toegang te krijgen
+                  Voer je email en wachtwoord in om toegang te krijgen
                 </Typography>
               </Box>
 
               <form onSubmit={handleSubmit}>
+                <TextField
+                  fullWidth
+                  type="email"
+                  label="Email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setError('');
+                  }}
+                  variant="outlined"
+                  sx={{ mb: 2 }}
+                  autoComplete="email"
+                />
+                
                 <TextField
                   fullWidth
                   type="password"
@@ -165,7 +185,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                   }}
                   variant="outlined"
                   sx={{ mb: 2 }}
-                  autoFocus
+                  autoComplete="current-password"
                 />
 
                 {error && (
@@ -179,6 +199,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                   fullWidth
                   variant="contained"
                   size="large"
+                  disabled={loading}
                   sx={{
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     py: 1.5,
@@ -190,7 +211,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                     },
                   }}
                 >
-                  Inloggen
+                  {loading ? 'Logging in...' : 'Inloggen'}
                 </Button>
               </form>
 

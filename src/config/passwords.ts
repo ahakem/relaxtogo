@@ -1,46 +1,60 @@
-// Password configuration for protected routes
+// Password configuration for protected routes - DEPRECATED
+// Now using Firebase Authentication instead
 
-export const VALID_PASSWORDS = [
-  'relaxtogo2024',
-  'yoga123',
-  'wellness456',
-  'mindful789'
-];
-
-// Check if a password is valid
-export const isValidPassword = (password: string): boolean => {
-  return VALID_PASSWORDS.includes(password);
-};
-
-// Session storage key for authentication
-export const AUTH_STORAGE_KEY = 'relaxtogo_auth';
+import { auth, db } from './firebase';
+import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 
 // Check if user is authenticated
 export const isAuthenticated = (): boolean => {
-  const authData = sessionStorage.getItem(AUTH_STORAGE_KEY);
-  if (!authData) return false;
+  return auth.currentUser !== null;
+};
+
+// Check if user is admin
+export const isAdmin = async (): Promise<boolean> => {
+  const user = auth.currentUser;
+  if (!user) return false;
   
   try {
-    const { timestamp } = JSON.parse(authData);
-    const now = Date.now();
-    const sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
-    
-    return (now - timestamp) < sessionTimeout;
-  } catch {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    const userData = userDoc.data();
+    return userData?.role === 'admin';
+  } catch (error) {
+    console.error('Error checking admin status:', error);
     return false;
   }
 };
 
-// Set authentication
-export const setAuthentication = (): void => {
-  const authData = {
-    timestamp: Date.now(),
-    authenticated: true
-  };
-  sessionStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(authData));
+// Login with email and password
+export const loginWithEmailPassword = async (email: string, password: string) => {
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 };
 
-// Clear authentication
+// Logout
+export const logout = async () => {
+  try {
+    await signOut(auth);
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+};
+
+// Listen to auth state changes
+export const onAuthChange = (callback: (user: any) => void) => {
+  return onAuthStateChanged(auth, callback);
+};
+
+// For backward compatibility
+export const setAuthentication = (): void => {
+  // Not needed with Firebase Auth
+};
+
 export const clearAuthentication = (): void => {
-  sessionStorage.removeItem(AUTH_STORAGE_KEY);
+  logout();
 };

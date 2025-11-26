@@ -56,14 +56,27 @@ You can create users through:
 
 In Firestore Database > Rules, add these rules:
 
+**For Development/Testing (Open Access):**
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Videos collection - read for authenticated users, write for admins only
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+```
+
+**For Production (Secure - Use Later):**
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Videos collection - read for all, write for authenticated users
     match /videos/{videoId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.token.admin == true;
+      allow read: if true;
+      allow write: if request.auth != null;
     }
     
     // Users collection
@@ -73,6 +86,8 @@ service cloud.firestore {
   }
 }
 ```
+
+**Important:** Start with the open rules for testing, then switch to production rules once Firebase Authentication is fully set up.
 
 ## Step 8: Access Admin Panel
 

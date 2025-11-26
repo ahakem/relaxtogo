@@ -26,8 +26,10 @@ import Header from './Header';
 import CategoryGrid from './CategoryGrid';
 import VideoList from './VideoList';
 import type { YogaVideo } from '../data/videos';
-import { clearAuthentication } from '../config/passwords';
+import { logout } from '../config/passwords';
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 type ViewMode = 'home' | 'category';
 
@@ -88,8 +90,8 @@ export default function YogaApp() {
     }));
   };
 
-  const handleLogout = () => {
-    clearAuthentication();
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
