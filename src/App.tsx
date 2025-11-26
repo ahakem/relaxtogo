@@ -7,6 +7,7 @@ import {
 import { theme } from './theme';
 import SimpleLanding from './components/SimpleLanding';
 import YogaApp from './components/YogaApp';
+import AdminPanel from './components/AdminPanel';
 import ProtectedRoute from './components/ProtectedRoute';
 import { isAuthenticated } from './config/passwords';
 
@@ -42,6 +43,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <YogaApp />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <AdminPanel />
               </ProtectedRoute>
             }
           />
