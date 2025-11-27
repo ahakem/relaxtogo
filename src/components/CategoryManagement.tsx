@@ -33,8 +33,10 @@ import {
   LocalFlorist,
   WbSunny,
   Nightlight,
+  ArrowUpward,
+  ArrowDownward,
 } from '@mui/icons-material';
-import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 interface Category {
@@ -43,6 +45,7 @@ interface Category {
   description: string;
   color: string;
   icon: string;
+  order: number;
 }
 
 // Available icons for selection
@@ -82,6 +85,8 @@ const CategoryManagement: React.FC = () => {
         id: doc.id,
         ...doc.data()
       } as Category));
+      // Sort by order field
+      loadedCategories.sort((a, b) => (a.order || 0) - (b.order || 0));
       setCategories(loadedCategories);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to load categories' });
@@ -133,12 +138,14 @@ const CategoryManagement: React.FC = () => {
         });
         setMessage({ type: 'success', text: 'Category updated successfully!' });
       } else {
-        // Create new category
+        // Create new category with order at the end
+        const maxOrder = categories.length > 0 ? Math.max(...categories.map(c => c.order || 0)) : -1;
         await addDoc(collection(db, 'categories'), {
           name: formData.name,
           description: formData.description,
           color: formData.color,
           icon: formData.icon,
+          order: maxOrder + 1,
         });
         setMessage({ type: 'success', text: 'Category created successfully!' });
       }
@@ -148,6 +155,50 @@ const CategoryManagement: React.FC = () => {
     } catch (error: any) {
       setMessage({ type: 'error', text: error.message || 'Failed to save category' });
       console.error('Error saving category:', error);
+    }
+  };
+
+  const handleMoveUp = async (index: number) => {
+    if (index === 0) return;
+    
+    try {
+      const batch = writeBatch(db);
+      const current = categories[index];
+      const previous = categories[index - 1];
+      
+      const currentOrder = current.order ?? index;
+      const previousOrder = previous.order ?? (index - 1);
+      
+      batch.update(doc(db, 'categories', current.id), { order: previousOrder });
+      batch.update(doc(db, 'categories', previous.id), { order: currentOrder });
+      
+      await batch.commit();
+      loadCategories();
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to reorder categories' });
+      console.error('Error reordering:', error);
+    }
+  };
+
+  const handleMoveDown = async (index: number) => {
+    if (index === categories.length - 1) return;
+    
+    try {
+      const batch = writeBatch(db);
+      const current = categories[index];
+      const next = categories[index + 1];
+      
+      const currentOrder = current.order ?? index;
+      const nextOrder = next.order ?? (index + 1);
+      
+      batch.update(doc(db, 'categories', current.id), { order: nextOrder });
+      batch.update(doc(db, 'categories', next.id), { order: currentOrder });
+      
+      await batch.commit();
+      loadCategories();
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to reorder categories' });
+      console.error('Error reordering:', error);
     }
   };
 
@@ -212,13 +263,29 @@ const CategoryManagement: React.FC = () => {
               />
             </ListItem>
           ) : (
-            categories.map((category) => {
+            categories.map((category, index) => {
               const IconComponent = getIconComponent(category.icon);
               return (
                 <ListItem
                   key={category.id}
                   secondaryAction={
                     <Box sx={{ display: 'flex', gap: 1 }}>
+                      <IconButton 
+                        edge="end" 
+                        onClick={() => handleMoveUp(index)}
+                        disabled={index === 0}
+                        size="small"
+                      >
+                        <ArrowUpward />
+                      </IconButton>
+                      <IconButton 
+                        edge="end" 
+                        onClick={() => handleMoveDown(index)}
+                        disabled={index === categories.length - 1}
+                        size="small"
+                      >
+                        <ArrowDownward />
+                      </IconButton>
                       <IconButton edge="end" onClick={() => handleEditCategory(category)}>
                         <Edit />
                       </IconButton>

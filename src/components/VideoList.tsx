@@ -51,6 +51,10 @@ const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }
         const loadedVideos = querySnapshot.docs.map(doc => ({
           ...doc.data()
         } as YogaVideo));
+        
+        // Sort by order field
+        loadedVideos.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+        
         setVideos(loadedVideos);
       } catch (error) {
         console.error('Error loading data:', error);

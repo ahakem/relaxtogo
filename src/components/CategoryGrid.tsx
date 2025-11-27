@@ -62,6 +62,10 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
           id: doc.id,
           ...doc.data()
         } as VideoCategory));
+        
+        // Sort by order field
+        loadedCategories.sort((a: any, b: any) => (a.order || 0) - (b.order || 0));
+        
         setCategories(loadedCategories);
       } catch (error) {
         console.error('Error loading categories:', error);
