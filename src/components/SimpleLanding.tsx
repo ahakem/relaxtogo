@@ -102,7 +102,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
             >
               <Box
                 component="iframe"
-                src="https://player.vimeo.com/video/1140736577?h=f6a0c2e531&title=0&byline=0&portrait=0"
+                src="https://player.vimeo.com/video/1140736577?h=f6a0c2e531&title=0&byline=0&portrait=0&dnt=1"
                 sx={{
                   position: 'absolute',
                   top: 0,

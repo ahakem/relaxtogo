@@ -257,7 +257,7 @@ export default function YogaApp() {
             <Box sx={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Box
                 component="iframe"
-                src={`https://player.vimeo.com/video/${state.selectedVideo.videoUrl.split('/')[3]}?h=${state.selectedVideo.videoUrl.split('/')[4]}&autoplay=1`}
+                src={`https://player.vimeo.com/video/${state.selectedVideo.videoUrl.split('/')[3]}?h=${state.selectedVideo.videoUrl.split('/')[4]}&autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
                 sx={{
                   width: '100%',
                   height: '100%',

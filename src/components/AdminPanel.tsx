@@ -17,6 +17,8 @@ import {
   Alert,
   CircularProgress,
   MenuItem,
+  Chip,
+  Divider,
 } from '@mui/material';
 import { Delete, Edit, Add, VideoLibrary, DragIndicator } from '@mui/icons-material';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
@@ -231,40 +233,80 @@ const AdminPanel: React.FC = () => {
                     />
                   </ListItem>
                 ) : (
-                  videos.map((video, index) => (
-                    <Draggable key={video.firestoreId} draggableId={video.firestoreId || ''} index={index}>
-                      {(provided, snapshot) => (
-                        <ListItem
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          sx={{
-                            backgroundColor: snapshot.isDragging ? 'action.hover' : 'inherit',
-                          }}
-                          secondaryAction={
-                            <Box sx={{ display: 'flex', gap: 1 }}>
-                              <IconButton edge="end" onClick={() => handleOpenDialog(video)}>
-                                <Edit />
-                              </IconButton>
-                              <IconButton edge="end" onClick={() => handleDelete(video.firestoreId)}>
-                                <Delete />
-                              </IconButton>
-                            </Box>
-                          }
-                        >
-                          <Box
-                            {...provided.dragHandleProps}
-                            sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'grab' }}
-                          >
-                            <DragIndicator sx={{ color: 'action.active' }} />
-                          </Box>
-                          <ListItemText
-                            primary={video.title}
-                            secondary={`${video.category} • ${video.duration}`}
-                          />
+                  (() => {
+                    // Group videos by category
+                    const groupedVideos = videos.reduce((acc, video) => {
+                      const category = categories.find(c => c.id === video.category);
+                      const categoryName = category?.name || video.category;
+                      if (!acc[categoryName]) {
+                        acc[categoryName] = [];
+                      }
+                      acc[categoryName].push(video);
+                      return acc;
+                    }, {} as Record<string, typeof videos>);
+
+                    return Object.entries(groupedVideos).map(([categoryName, categoryVideos], groupIndex) => (
+                      <React.Fragment key={categoryName}>
+                        {groupIndex > 0 && <Divider />}
+                        <ListItem sx={{ backgroundColor: 'action.hover', py: 1 }}>
+                          <Typography variant="subtitle2" fontWeight={600} color="primary">
+                            {categoryName} ({categoryVideos.length})
+                          </Typography>
                         </ListItem>
-                      )}
-                    </Draggable>
-                  ))
+                        {categoryVideos.map((video, index) => {
+                          const globalIndex = videos.indexOf(video);
+                          return (
+                            <Draggable key={video.firestoreId} draggableId={video.firestoreId || ''} index={globalIndex}>
+                              {(provided, snapshot) => (
+                                <ListItem
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  sx={{
+                                    backgroundColor: snapshot.isDragging ? 'action.hover' : 'inherit',
+                                  }}
+                                  secondaryAction={
+                                    <Box sx={{ display: 'flex', gap: 1 }}>
+                                      <IconButton edge="end" onClick={() => handleOpenDialog(video)}>
+                                        <Edit />
+                                      </IconButton>
+                                      <IconButton edge="end" onClick={() => handleDelete(video.firestoreId)}>
+                                        <Delete />
+                                      </IconButton>
+                                    </Box>
+                                  }
+                                >
+                                  <Box
+                                    {...provided.dragHandleProps}
+                                    sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'grab' }}
+                                  >
+                                    <DragIndicator sx={{ color: 'action.active' }} />
+                                  </Box>
+                                  <ListItemText
+                                    primary={
+                                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        {video.title}
+                                        <Chip 
+                                          label={categoryName} 
+                                          size="small" 
+                                          sx={{ 
+                                            fontSize: '0.75rem',
+                                            height: 20,
+                                            backgroundColor: 'primary.light',
+                                            color: 'white'
+                                          }} 
+                                        />
+                                      </Box>
+                                    }
+                                    secondary={video.duration}
+                                  />
+                                </ListItem>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                      </React.Fragment>
+                    ));
+                  })()
                 )}
                 {provided.placeholder}
               </List>
