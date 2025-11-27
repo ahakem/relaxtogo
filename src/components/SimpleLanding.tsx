@@ -67,7 +67,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 fontSize: { xs: '2rem', md: '3rem' },
               }}
             >
-              Welkom bij Relax to Go
+              Welcome to Relax to Go
             </Typography>
             <Typography
               variant="h5"
@@ -77,7 +77,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 fontWeight: 300,
               }}
             >
-              Jouw persoonlijke yoga video bibliotheek
+              Your personalised online yoga experience
             </Typography>
             <Typography
               variant="body1"
@@ -87,9 +87,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 lineHeight: 1.8,
               }}
             >
-              Ontdek onze collectie van zorgvuldig samengestelde yoga video's. 
-              Van kern- en rugversterkende oefeningen tot volledige body flows - 
-              alles wat je nodig hebt voor jouw yoga practice, altijd binnen handbereik.
+              With our collection of carefully curated yoga instructions, we provide everything you need to keep your body moving. Through our videos, you will learn core- and back-strengthening exercises, as well as full-body flows. All easily accessible at your own pace.
             </Typography>
 
             {/* Vimeo Video Embed */}
@@ -155,7 +153,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                   Login
                 </Typography>
                 <Typography variant="body2" sx={{ color: '#666', mt: 1 }}>
-                  Voer je email en wachtwoord in om toegang te krijgen
+                  Enter your email and password to access
                 </Typography>
               </Box>
 
@@ -177,7 +175,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 <TextField
                   fullWidth
                   type="password"
-                  label="Wachtwoord"
+                  label="Password"
                   value={password}
                   onChange={(e) => {
                     setPassword(e.target.value);
@@ -211,7 +209,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                     },
                   }}
                 >
-                  {loading ? 'Logging in...' : 'Inloggen'}
+                  {loading ? 'Logging in...' : 'Log In'}
                 </Button>
               </form>
 
@@ -224,7 +222,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                   color: '#999',
                 }}
               >
-                © 2025 Relax to Go - Alle rechten voorbehouden
+                © 2025 Relax to Go - All rights reserved
               </Typography>
             </Paper>
           </Box>
