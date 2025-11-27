@@ -33,11 +33,12 @@ import {
   LocalFlorist,
   WbSunny,
   Nightlight,
-  ArrowUpward,
-  ArrowDownward,
+  DragIndicator,
 } from '@mui/icons-material';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '../config/firebase';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 
 interface Category {
   id: string;
@@ -158,50 +159,6 @@ const CategoryManagement: React.FC = () => {
     }
   };
 
-  const handleMoveUp = async (index: number) => {
-    if (index === 0) return;
-    
-    try {
-      const batch = writeBatch(db);
-      const current = categories[index];
-      const previous = categories[index - 1];
-      
-      const currentOrder = current.order ?? index;
-      const previousOrder = previous.order ?? (index - 1);
-      
-      batch.update(doc(db, 'categories', current.id), { order: previousOrder });
-      batch.update(doc(db, 'categories', previous.id), { order: currentOrder });
-      
-      await batch.commit();
-      loadCategories();
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to reorder categories' });
-      console.error('Error reordering:', error);
-    }
-  };
-
-  const handleMoveDown = async (index: number) => {
-    if (index === categories.length - 1) return;
-    
-    try {
-      const batch = writeBatch(db);
-      const current = categories[index];
-      const next = categories[index + 1];
-      
-      const currentOrder = current.order ?? index;
-      const nextOrder = next.order ?? (index + 1);
-      
-      batch.update(doc(db, 'categories', current.id), { order: nextOrder });
-      batch.update(doc(db, 'categories', next.id), { order: currentOrder });
-      
-      await batch.commit();
-      loadCategories();
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to reorder categories' });
-      console.error('Error reordering:', error);
-    }
-  };
-
   const handleDeleteCategory = async (categoryId: string) => {
     if (window.confirm('Are you sure you want to delete this category?')) {
       try {
@@ -212,6 +169,33 @@ const CategoryManagement: React.FC = () => {
         setMessage({ type: 'error', text: 'Failed to delete category' });
         console.error('Error deleting category:', error);
       }
+    }
+  };
+
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+    
+    if (sourceIndex === destIndex) return;
+    
+    try {
+      const batch = writeBatch(db);
+      const reorderedCategories = Array.from(categories);
+      const [removed] = reorderedCategories.splice(sourceIndex, 1);
+      reorderedCategories.splice(destIndex, 0, removed);
+      
+      // Update order for all affected categories
+      reorderedCategories.forEach((category, index) => {
+        batch.update(doc(db, 'categories', category.id), { order: index });
+      });
+      
+      await batch.commit();
+      setCategories(reorderedCategories);
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to reorder categories' });
+      console.error('Error reordering:', error);
     }
   };
 
@@ -254,73 +238,78 @@ const CategoryManagement: React.FC = () => {
       )}
 
       <Paper elevation={2}>
-        <List>
-          {categories.length === 0 ? (
-            <ListItem>
-              <ListItemText 
-                primary="No categories yet" 
-                secondary="Click 'Add Category' to create your first category"
-              />
-            </ListItem>
-          ) : (
-            categories.map((category, index) => {
-              const IconComponent = getIconComponent(category.icon);
-              return (
-                <ListItem
-                  key={category.id}
-                  secondaryAction={
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <IconButton 
-                        edge="end" 
-                        onClick={() => handleMoveUp(index)}
-                        disabled={index === 0}
-                        size="small"
-                      >
-                        <ArrowUpward />
-                      </IconButton>
-                      <IconButton 
-                        edge="end" 
-                        onClick={() => handleMoveDown(index)}
-                        disabled={index === categories.length - 1}
-                        size="small"
-                      >
-                        <ArrowDownward />
-                      </IconButton>
-                      <IconButton edge="end" onClick={() => handleEditCategory(category)}>
-                        <Edit />
-                      </IconButton>
-                      <IconButton edge="end" onClick={() => handleDeleteCategory(category.id)}>
-                        <Delete />
-                      </IconButton>
-                    </Box>
-                  }
-                >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 2,
-                        backgroundColor: category.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}
-                    >
-                      <IconComponent sx={{ color: 'white', fontSize: 28 }} />
-                    </Box>
-                    <ListItemText
-                      primary={
-                        <Typography variant="body1" fontWeight={600}>{category.name}</Typography>
-                      }
-                      secondary={category.description}
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="categories">
+            {(provided) => (
+              <List {...provided.droppableProps} ref={provided.innerRef}>
+                {categories.length === 0 ? (
+                  <ListItem>
+                    <ListItemText 
+                      primary="No categories yet" 
+                      secondary="Click 'Add Category' to create your first category"
                     />
-                  </Box>
-                </ListItem>
-              );
-            })
-          )}
-        </List>
+                  </ListItem>
+                ) : (
+                  categories.map((category, index) => {
+                    const IconComponent = getIconComponent(category.icon);
+                    return (
+                      <Draggable key={category.id} draggableId={category.id} index={index}>
+                        {(provided, snapshot) => (
+                          <ListItem
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            sx={{
+                              backgroundColor: snapshot.isDragging ? 'action.hover' : 'inherit',
+                            }}
+                            secondaryAction={
+                              <Box sx={{ display: 'flex', gap: 1 }}>
+                                <IconButton edge="end" onClick={() => handleEditCategory(category)}>
+                                  <Edit />
+                                </IconButton>
+                                <IconButton edge="end" onClick={() => handleDeleteCategory(category.id)}>
+                                  <Delete />
+                                </IconButton>
+                              </Box>
+                            }
+                          >
+                            <Box
+                              {...provided.dragHandleProps}
+                              sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'grab' }}
+                            >
+                              <DragIndicator sx={{ color: 'action.active' }} />
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
+                              <Box
+                                sx={{
+                                  width: 48,
+                                  height: 48,
+                                  borderRadius: 2,
+                                  backgroundColor: category.color,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}
+                              >
+                                <IconComponent sx={{ color: 'white', fontSize: 28 }} />
+                              </Box>
+                              <ListItemText
+                                primary={
+                                  <Typography variant="body1" fontWeight={600}>{category.name}</Typography>
+                                }
+                                secondary={category.description}
+                              />
+                            </Box>
+                          </ListItem>
+                        )}
+                      </Draggable>
+                    );
+                  })
+                )}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Paper>
 
       {/* Add/Edit Category Dialog */}

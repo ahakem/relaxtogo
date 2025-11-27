@@ -18,10 +18,12 @@ import {
   CircularProgress,
   MenuItem,
 } from '@mui/material';
-import { Delete, Edit, Add, VideoLibrary, ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { Delete, Edit, Add, VideoLibrary, DragIndicator } from '@mui/icons-material';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import type { YogaVideo } from '../data/videos';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import type { DropResult } from '@hello-pangea/dnd';
 
 interface Category {
   id: string;
@@ -154,48 +156,29 @@ const AdminPanel: React.FC = () => {
     }
   };
 
-  const handleMoveUp = async (index: number) => {
-    if (index === 0) return;
+  const handleDragEnd = async (result: DropResult) => {
+    if (!result.destination) return;
+    
+    const sourceIndex = result.source.index;
+    const destIndex = result.destination.index;
+    
+    if (sourceIndex === destIndex) return;
     
     try {
       const batch = writeBatch(db);
-      const current = videos[index];
-      const previous = videos[index - 1];
+      const reorderedVideos = Array.from(videos);
+      const [removed] = reorderedVideos.splice(sourceIndex, 1);
+      reorderedVideos.splice(destIndex, 0, removed);
       
-      if (!current.firestoreId || !previous.firestoreId) return;
-      
-      const currentOrder = (current as any).order ?? index;
-      const previousOrder = (previous as any).order ?? (index - 1);
-      
-      batch.update(doc(db, 'videos', current.firestoreId), { order: previousOrder });
-      batch.update(doc(db, 'videos', previous.firestoreId), { order: currentOrder });
-      
-      await batch.commit();
-      loadVideos();
-    } catch (error) {
-      setMessage({ type: 'error', text: 'Failed to reorder videos' });
-      console.error('Error reordering:', error);
-    }
-  };
-
-  const handleMoveDown = async (index: number) => {
-    if (index === videos.length - 1) return;
-    
-    try {
-      const batch = writeBatch(db);
-      const current = videos[index];
-      const next = videos[index + 1];
-      
-      if (!current.firestoreId || !next.firestoreId) return;
-      
-      const currentOrder = (current as any).order ?? index;
-      const nextOrder = (next as any).order ?? (index + 1);
-      
-      batch.update(doc(db, 'videos', current.firestoreId), { order: nextOrder });
-      batch.update(doc(db, 'videos', next.firestoreId), { order: currentOrder });
+      // Update order for all affected videos
+      reorderedVideos.forEach((video, index) => {
+        if (video.firestoreId) {
+          batch.update(doc(db, 'videos', video.firestoreId), { order: index });
+        }
+      });
       
       await batch.commit();
-      loadVideos();
+      setVideos(reorderedVideos);
     } catch (error) {
       setMessage({ type: 'error', text: 'Failed to reorder videos' });
       console.error('Error reordering:', error);
@@ -236,53 +219,58 @@ const AdminPanel: React.FC = () => {
       )}
 
       <Paper elevation={2}>
-        <List>
-          {videos.length === 0 ? (
-            <ListItem>
-              <ListItemText 
-                primary="No videos yet" 
-                secondary="Click 'Add Video' to create your first video"
-              />
-            </ListItem>
-          ) : (
-            videos.map((video, index) => (
-              <ListItem
-                key={video.firestoreId}
-                secondaryAction={
-                  <Box sx={{ display: 'flex', gap: 1 }}>
-                    <IconButton 
-                      edge="end" 
-                      onClick={() => handleMoveUp(index)}
-                      disabled={index === 0}
-                      size="small"
-                    >
-                      <ArrowUpward />
-                    </IconButton>
-                    <IconButton 
-                      edge="end" 
-                      onClick={() => handleMoveDown(index)}
-                      disabled={index === videos.length - 1}
-                      size="small"
-                    >
-                      <ArrowDownward />
-                    </IconButton>
-                    <IconButton edge="end" onClick={() => handleOpenDialog(video)}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton edge="end" onClick={() => handleDelete(video.firestoreId)}>
-                      <Delete />
-                    </IconButton>
-                  </Box>
-                }
-              >
-                <ListItemText
-                  primary={video.title}
-                  secondary={`${video.category} • ${video.duration}`}
-                />
-              </ListItem>
-            ))
-          )}
-        </List>
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="videos">
+            {(provided) => (
+              <List {...provided.droppableProps} ref={provided.innerRef}>
+                {videos.length === 0 ? (
+                  <ListItem>
+                    <ListItemText 
+                      primary="No videos yet" 
+                      secondary="Click 'Add Video' to create your first video"
+                    />
+                  </ListItem>
+                ) : (
+                  videos.map((video, index) => (
+                    <Draggable key={video.firestoreId} draggableId={video.firestoreId || ''} index={index}>
+                      {(provided, snapshot) => (
+                        <ListItem
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          sx={{
+                            backgroundColor: snapshot.isDragging ? 'action.hover' : 'inherit',
+                          }}
+                          secondaryAction={
+                            <Box sx={{ display: 'flex', gap: 1 }}>
+                              <IconButton edge="end" onClick={() => handleOpenDialog(video)}>
+                                <Edit />
+                              </IconButton>
+                              <IconButton edge="end" onClick={() => handleDelete(video.firestoreId)}>
+                                <Delete />
+                              </IconButton>
+                            </Box>
+                          }
+                        >
+                          <Box
+                            {...provided.dragHandleProps}
+                            sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'grab' }}
+                          >
+                            <DragIndicator sx={{ color: 'action.active' }} />
+                          </Box>
+                          <ListItemText
+                            primary={video.title}
+                            secondary={`${video.category} • ${video.duration}`}
+                          />
+                        </ListItem>
+                      )}
+                    </Draggable>
+                  ))
+                )}
+                {provided.placeholder}
+              </List>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Paper>
 
       {/* Add/Edit Dialog */}
