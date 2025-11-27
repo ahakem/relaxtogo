@@ -137,7 +137,13 @@ const VideoList: React.FC<VideoListProps> = ({ categoryId, onBack, onVideoPlay }
           <Button 
             variant="contained" 
             onClick={onBack}
-            sx={{ backgroundColor: category.color }}
+            sx={{ 
+              backgroundColor: category.color,
+              '&:hover': {
+                backgroundColor: category.color,
+                filter: 'brightness(0.85)',
+              }
+            }}
           >
             Browse Other Categories
           </Button>
