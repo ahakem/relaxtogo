@@ -253,7 +253,7 @@ const AdminPanel: React.FC = () => {
                             {categoryName} ({categoryVideos.length})
                           </Typography>
                         </ListItem>
-                        {categoryVideos.map((video, index) => {
+                        {categoryVideos.map((video) => {
                           const globalIndex = videos.indexOf(video);
                           return (
                             <Draggable key={video.firestoreId} draggableId={video.firestoreId || ''} index={globalIndex}>
