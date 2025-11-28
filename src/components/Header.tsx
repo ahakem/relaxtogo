@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -9,6 +9,8 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon, SelfImprovement, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -17,6 +19,23 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick, showAdminButton = false }) => {
   const navigate = useNavigate();
+  const [siteName, setSiteName] = useState('Relax to Go');
+
+  useEffect(() => {
+    const loadSiteName = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, 'siteSettings'));
+        if (!querySnapshot.empty) {
+          const settingsDoc = querySnapshot.docs[0];
+          setSiteName(settingsDoc.data().siteName || 'Relax to Go');
+          document.title = settingsDoc.data().siteName || 'Relax to Go';
+        }
+      } catch (error) {
+        console.error('Error loading site name:', error);
+      }
+    };
+    loadSiteName();
+  }, []);
 
   return (
     <AppBar 
@@ -51,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showAdminButton = false })
               letterSpacing: '0.5px',
             }}
           >
-            Relax to Go
+            {siteName}
           </Typography>
         </Box>
 
