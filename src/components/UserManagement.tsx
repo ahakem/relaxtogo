@@ -36,6 +36,7 @@ import { logout } from '../config/passwords';
 import { useNavigate } from 'react-router-dom';
 import AdminPanel from './AdminPanel';
 import CategoryManagement from './CategoryManagement';
+import SiteSettings from './SiteSettings';
 import Header from './Header';
 
 interface User {
@@ -239,6 +240,7 @@ const UserManagement: React.FC = () => {
           <Tab icon={<VideoLibrary />} label="Videos" />
           <Tab icon={<Category />} label="Categories" />
           <Tab icon={<People />} label="Users" />
+          <Tab icon={<Settings />} label="Site Settings" />
         </Tabs>
       </Box>
 
@@ -391,6 +393,8 @@ const UserManagement: React.FC = () => {
           </Dialog>
         </>
       )}
+
+      {tabValue === 3 && <SiteSettings />}
 
       <Drawer
         anchor="left"

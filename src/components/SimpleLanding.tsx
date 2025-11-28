@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -7,12 +7,22 @@ import {
   Button,
   Paper,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 import { Lock } from '@mui/icons-material';
 import { loginWithEmailPassword } from '../config/passwords';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebase';
 
 interface SimpleLandingProps {
   onLogin: () => void;
+}
+
+interface SiteSettingsData {
+  siteName: string;
+  tagline: string;
+  homeDescription: string;
+  homeVideoUrl: string;
 }
 
 const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
@@ -20,6 +30,33 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [settingsLoading, setSettingsLoading] = useState(true);
+  const [siteSettings, setSiteSettings] = useState<SiteSettingsData>({
+    siteName: 'Relax to Go',
+    tagline: 'Your personalised online yoga experience',
+    homeDescription: 'With our collection of carefully curated yoga instructions, we provide everything you need to keep your body moving. Through our videos, you will learn core- and back-strengthening exercises, as well as full-body flows. All easily accessible at your own pace.',
+    homeVideoUrl: 'https://player.vimeo.com/video/1140736577?h=f6a0c2e531',
+  });
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const querySnapshot = await getDocs(collection(db, 'siteSettings'));
+      if (!querySnapshot.empty) {
+        const settingsDoc = querySnapshot.docs[0];
+        setSiteSettings(settingsDoc.data() as SiteSettingsData);
+        // Update document title
+        document.title = settingsDoc.data().siteName || 'Relax to Go';
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    } finally {
+      setSettingsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +73,22 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
     }
     setLoading(false);
   };
+
+  if (settingsLoading) {
+    return (
+      <Box
+        sx={{
+          minHeight: '100vh',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CircularProgress sx={{ color: 'white' }} />
+      </Box>
+    );
+  }
 
   return (
     <Box
@@ -67,7 +120,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 fontSize: { xs: '2rem', md: '3rem' },
               }}
             >
-              Welcome to Relax to Go
+              {siteSettings.siteName}
             </Typography>
             <Typography
               variant="h5"
@@ -77,7 +130,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 fontWeight: 300,
               }}
             >
-              Your personalised online yoga experience
+              {siteSettings.tagline}
             </Typography>
             <Typography
               variant="body1"
@@ -87,7 +140,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
                 lineHeight: 1.8,
               }}
             >
-              With our collection of carefully curated yoga instructions, we provide everything you need to keep your body moving. Through our videos, you will learn core- and back-strengthening exercises, as well as full-body flows. All easily accessible at your own pace.
+              {siteSettings.homeDescription}
             </Typography>
 
             {/* Vimeo Video Embed */}
@@ -102,7 +155,7 @@ const SimpleLanding: React.FC<SimpleLandingProps> = ({ onLogin }) => {
             >
               <Box
                 component="iframe"
-                src="https://player.vimeo.com/video/1140736577?h=f6a0c2e531&title=0&byline=0&portrait=0&dnt=1"
+                src={`${siteSettings.homeVideoUrl}&title=0&byline=0&portrait=0&dnt=1`}
                 sx={{
                   position: 'absolute',
                   top: 0,
