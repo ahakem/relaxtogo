@@ -7,7 +7,7 @@ import {
   Box,
   Button,
 } from '@mui/material';
-import { Menu as MenuIcon, SelfImprovement, AdminPanelSettings } from '@mui/icons-material';
+import { Menu as MenuIcon, AdminPanelSettings } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
