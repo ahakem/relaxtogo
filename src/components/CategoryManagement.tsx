@@ -18,23 +18,9 @@ import {
   Grid,
   Card,
   CardContent,
+  Link,
 } from '@mui/material';
-import { 
-  Delete, 
-  Add, 
-  Edit,
-  FitnessCenter,
-  SelfImprovement,
-  DirectionsRun,
-  Psychology,
-  Healing,
-  Spa,
-  FavoriteBorder,
-  LocalFlorist,
-  WbSunny,
-  Nightlight,
-  DragIndicator,
-} from '@mui/icons-material';
+import * as MuiIcons from '@mui/icons-material';
 import { collection, addDoc, updateDoc, deleteDoc, doc, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -51,16 +37,16 @@ interface Category {
 
 // Available icons for selection
 const availableIcons = [
-  { name: 'FitnessCenter', component: FitnessCenter, label: 'Fitness' },
-  { name: 'SelfImprovement', component: SelfImprovement, label: 'Meditation' },
-  { name: 'DirectionsRun', component: DirectionsRun, label: 'Running' },
-  { name: 'Psychology', component: Psychology, label: 'Mind' },
-  { name: 'Healing', component: Healing, label: 'Healing' },
-  { name: 'Spa', component: Spa, label: 'Spa' },
-  { name: 'FavoriteBorder', component: FavoriteBorder, label: 'Heart' },
-  { name: 'LocalFlorist', component: LocalFlorist, label: 'Flower' },
-  { name: 'WbSunny', component: WbSunny, label: 'Sun' },
-  { name: 'Nightlight', component: Nightlight, label: 'Moon' },
+  { name: 'FitnessCenter', component: MuiIcons.FitnessCenter, label: 'Fitness' },
+  { name: 'SelfImprovement', component: MuiIcons.SelfImprovement, label: 'Meditation' },
+  { name: 'DirectionsRun', component: MuiIcons.DirectionsRun, label: 'Running' },
+  { name: 'Psychology', component: MuiIcons.Psychology, label: 'Mind' },
+  { name: 'Healing', component: MuiIcons.Healing, label: 'Healing' },
+  { name: 'Spa', component: MuiIcons.Spa, label: 'Spa' },
+  { name: 'FavoriteBorder', component: MuiIcons.FavoriteBorder, label: 'Heart' },
+  { name: 'LocalFlorist', component: MuiIcons.LocalFlorist, label: 'Flower' },
+  { name: 'WbSunny', component: MuiIcons.WbSunny, label: 'Sun' },
+  { name: 'Nightlight', component: MuiIcons.Nightlight, label: 'Moon' },
 ];
 
 const CategoryManagement: React.FC = () => {
@@ -200,8 +186,9 @@ const CategoryManagement: React.FC = () => {
   };
 
   const getIconComponent = (iconName: string) => {
-    const icon = availableIcons.find(i => i.name === iconName);
-    return icon ? icon.component : FitnessCenter;
+    // Try to get icon from MuiIcons
+    const IconComponent = (MuiIcons as any)[iconName];
+    return IconComponent || MuiIcons.FitnessCenter;
   };
 
   if (loading) {
@@ -216,14 +203,14 @@ const CategoryManagement: React.FC = () => {
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <LocalFlorist sx={{ fontSize: 40, color: 'primary.main' }} />
+          <MuiIcons.LocalFlorist sx={{ fontSize: 40, color: 'primary.main' }} />
           <Typography variant="h4" fontWeight={600}>
             Category Management
           </Typography>
         </Box>
         <Button
           variant="contained"
-          startIcon={<Add />}
+          startIcon={<MuiIcons.Add />}
           onClick={handleOpenDialog}
           size="large"
         >
@@ -264,10 +251,10 @@ const CategoryManagement: React.FC = () => {
                             secondaryAction={
                               <Box sx={{ display: 'flex', gap: 1 }}>
                                 <IconButton edge="end" onClick={() => handleEditCategory(category)}>
-                                  <Edit />
+                                  <MuiIcons.Edit />
                                 </IconButton>
                                 <IconButton edge="end" onClick={() => handleDeleteCategory(category.id)}>
-                                  <Delete />
+                                  <MuiIcons.Delete />
                                 </IconButton>
                               </Box>
                             }
@@ -276,7 +263,7 @@ const CategoryManagement: React.FC = () => {
                               {...provided.dragHandleProps}
                               sx={{ display: 'flex', alignItems: 'center', mr: 2, cursor: 'grab' }}
                             >
-                              <DragIndicator sx={{ color: 'action.active' }} />
+                              <MuiIcons.DragIndicator sx={{ color: 'action.active' }} />
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                               <Box
@@ -343,8 +330,43 @@ const CategoryManagement: React.FC = () => {
             />
             
             <Box>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}>
+                <Typography variant="subtitle2">
+                  Icon Name
+                </Typography>
+                <Link 
+                  href="https://mui.com/material-ui/material-icons/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  variant="caption"
+                >
+                  Browse Icons
+                </Link>
+              </Box>
+              <TextField
+                label="Material UI Icon Name"
+                fullWidth
+                value={formData.icon}
+                onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
+                helperText="e.g., FitnessCenter, Spa, LocalFlorist"
+                placeholder="FitnessCenter"
+              />
+              {formData.icon && (() => {
+                const PreviewIcon = getIconComponent(formData.icon);
+                return (
+                  <Box sx={{ mt: 2, p: 2, border: '1px solid', borderColor: 'divider', borderRadius: 1, textAlign: 'center' }}>
+                    <Typography variant="caption" color="text.secondary" display="block" sx={{ mb: 1 }}>
+                      Preview:
+                    </Typography>
+                    <PreviewIcon sx={{ fontSize: 48, color: formData.color }} />
+                  </Box>
+                );
+              })()}
+            </Box>
+            
+            <Box>
               <Typography variant="subtitle2" gutterBottom>
-                Select Icon
+                Quick Select Icons
               </Typography>
               <Grid container spacing={1}>
                 {availableIcons.map((icon) => {

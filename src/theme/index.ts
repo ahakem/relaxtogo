@@ -3,9 +3,9 @@ import { createTheme } from '@mui/material/styles';
 export const theme = createTheme({
   palette: {
     primary: {
-      main: '#4CAF50', // Calming green
-      light: '#81C784',
-      dark: '#388E3C',
+      main: '#3e796a', // Darker calming green
+      light: '#5a9b89',
+      dark: '#2d5a4f',
     },
     secondary: {
       main: '#673AB7', // Purple for accent

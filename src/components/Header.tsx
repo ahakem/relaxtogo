@@ -42,7 +42,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showAdminButton = false })
       position="sticky" 
       elevation={2}
       sx={{ 
-        background: 'linear-gradient(135deg, #4CAF50 0%, #81C784 100%)',
+        background: '#3e796a',
         left: 0,
         right: 0,
         width: '100%',
@@ -53,13 +53,12 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showAdminButton = false })
           edge="start"
           color="inherit"
           onClick={onMenuClick}
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, color: 'white' }}
         >
           <MenuIcon />
         </IconButton>
         
         <Box display="flex" alignItems="center" flexGrow={1}>
-          <SelfImprovement sx={{ mr: 1, fontSize: '2rem' }} />
           <Typography
             variant="h1"
             component="h1"
@@ -83,6 +82,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick, showAdminButton = false })
               textTransform: 'none',
               fontWeight: 600,
               display: { xs: 'none', sm: 'flex' },
+              color: 'white',
             }}
           >
             Admin

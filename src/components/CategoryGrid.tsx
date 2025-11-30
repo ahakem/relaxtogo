@@ -8,19 +8,7 @@ import {
   CircularProgress,
   Button,
 } from '@mui/material';
-import { 
-  WbSunny, 
-  Nightlight, 
-  FitnessCenter, 
-  SelfImprovement, 
-  Spa, 
-  School,
-  DirectionsRun,
-  Psychology,
-  Healing,
-  FavoriteBorder,
-  LocalFlorist,
-} from '@mui/icons-material';
+import * as MuiIcons from '@mui/icons-material';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
@@ -36,18 +24,9 @@ interface CategoryGridProps {
   onCategorySelect: (categoryId: string) => void;
 }
 
-const iconMap: { [key: string]: React.ElementType } = {
-  WbSunny,
-  Nightlight,
-  FitnessCenter,
-  SelfImprovement,
-  Spa,
-  School,
-  DirectionsRun,
-  Psychology,
-  Healing,
-  FavoriteBorder,
-  LocalFlorist,
+const getIconComponent = (iconName: string) => {
+  const IconComponent = (MuiIcons as any)[iconName];
+  return IconComponent || MuiIcons.FitnessCenter;
 };
 
 const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
@@ -102,7 +81,7 @@ const CategoryGrid: React.FC<CategoryGridProps> = ({ onCategorySelect }) => {
       
       <Grid container spacing={3}>
         {categories.map((category: VideoCategory) => {
-          const IconComponent = iconMap[category.icon] || SelfImprovement;
+          const IconComponent = getIconComponent(category.icon);
           
           return (
             <Grid item xs={12} sm={6} md={4} key={category.id}>
